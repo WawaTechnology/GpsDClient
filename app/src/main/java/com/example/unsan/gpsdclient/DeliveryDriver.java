@@ -7,7 +7,19 @@ package com.example.unsan.gpsdclient;
 public class DeliveryDriver {
 
     String deliveryTime;
+    String driverName;
 
+    public DeliveryDriver(String deliveryTime, String deliveryDate, String photo, long timeval, String customer, String destinationAddress, String gpsDestinationAddress, String carNumber,String driverName) {
+        this.deliveryTime = deliveryTime;
+        this.deliveryDate = deliveryDate;
+        this.photo = photo;
+        this.timeval = timeval;
+        this.customer = customer;
+        this.destinationAddress = destinationAddress;
+        this.gpsDestinationAddress = gpsDestinationAddress;
+        this.carNumber = carNumber;
+        this.driverName=driverName;
+    }
     public DeliveryDriver(String deliveryTime, String deliveryDate, String photo, long timeval, String customer, String destinationAddress, String gpsDestinationAddress, String carNumber) {
         this.deliveryTime = deliveryTime;
         this.deliveryDate = deliveryDate;
@@ -17,7 +29,17 @@ public class DeliveryDriver {
         this.destinationAddress = destinationAddress;
         this.gpsDestinationAddress = gpsDestinationAddress;
         this.carNumber = carNumber;
+
     }
+
+    public String getDriverName() {
+        return driverName;
+    }
+
+    public void setDriverName(String driverName) {
+        this.driverName = driverName;
+    }
+
     public DeliveryDriver()
     {
 

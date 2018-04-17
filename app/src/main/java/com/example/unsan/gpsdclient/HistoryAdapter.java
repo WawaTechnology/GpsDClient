@@ -1,6 +1,7 @@
 package com.example.unsan.gpsdclient;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -35,7 +36,7 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        DeliveryDriver delivery=deliveryList.get(position);
+        final DeliveryDriver delivery=deliveryList.get(position);
 
         holder.deliverdTo.setText(delivery.destinationAddress);
         holder.reachedTime.setText(delivery.deliveryTime);
@@ -43,6 +44,15 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
         holder.gpsLocation.setText(delivery.gpsDestinationAddress);
         holder.dateText.setText(delivery.getDeliveryDate());
         holder.carNumber.setText(delivery.carNumber);
+        holder.driverName.setText(delivery.driverName);
+        holder.driverName.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent=new Intent(context,DriverActivity.class);
+                intent.putExtra("drivername",delivery.driverName);
+                context.startActivity(intent);
+            }
+        });
         String photo= delivery.getPhoto();
         Glide.with(context)
                 .load(photo)
@@ -58,7 +68,7 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
 
     class ViewHolder extends RecyclerView.ViewHolder {
 
-        TextView carNumber,reachedTime,customernm,deliverdTo,gpsLocation,dateText;
+        TextView carNumber,reachedTime,customernm,deliverdTo,gpsLocation,dateText,driverName;
         ImageView prodimage;
         public ViewHolder(View itemView) {
             super(itemView);
@@ -70,6 +80,7 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
             gpsLocation=(itemView).findViewById(R.id.car_address);
             dateText=(itemView).findViewById(R.id.travel_date);
             carNumber=(itemView).findViewById(R.id.car_num);
+            driverName=(itemView).findViewById(R.id.driver_name);
 
         }
     }
