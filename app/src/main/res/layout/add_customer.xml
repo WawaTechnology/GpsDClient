@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_marginLeft="12dp"
+   >
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+
+
+        android:orientation="horizontal">
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.3"
+            android:textStyle="bold"
+            android:text="Restaurant Name: "/>
+        <EditText
+            android:layout_marginLeft="12dp"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.5"
+            android:layout_marginRight="12dp"
+
+            android:id="@+id/rest_name"/>
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+
+        android:orientation="horizontal">
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.3"
+            android:textStyle="bold"
+            android:text="Address: "/>
+        <EditText
+            android:layout_marginLeft="12dp"
+            android:layout_width="0dp"
+            android:layout_weight="0.5"
+            android:layout_marginRight="12dp"
+            android:layout_height="wrap_content"
+            android:maxLines="2"
+
+            android:id="@+id/address"/>
+    </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+
+            android:orientation="horizontal">
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.3"
+                android:textStyle="bold"
+                android:text="City: "/>
+            <EditText
+                android:layout_marginLeft="12dp"
+                android:layout_width="0dp"
+                android:layout_weight="0.5"
+                android:layout_marginRight="12dp"
+                android:layout_height="wrap_content"
+
+                android:id="@+id/city"/>
+        </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+
+        android:orientation="horizontal">
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.3"
+            android:textStyle="bold"
+            android:text="Contact Person: "/>
+        <EditText
+            android:layout_marginLeft="12dp"
+            android:layout_width="0dp"
+            android:layout_weight="0.5"
+            android:layout_marginRight="12dp"
+            android:layout_height="wrap_content"
+
+            android:id="@+id/contact_person"/>
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+
+        android:orientation="horizontal">
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.3"
+            android:textStyle="bold"
+            android:text="Contact Number: "/>
+        <EditText
+            android:layout_marginLeft="12dp"
+            android:layout_width="0dp"
+            android:layout_weight="0.5"
+            android:layout_marginRight="12dp"
+            android:layout_height="wrap_content"
+            android:inputType="number"
+
+            android:id="@+id/contact_number"/>
+
+</LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+
+        android:orientation="horizontal">
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.3"
+            android:textStyle="bold"
+            android:text="Zip: "/>
+        <EditText
+            android:layout_marginLeft="12dp"
+            android:layout_width="0dp"
+            android:layout_weight="0.5"
+            android:layout_marginRight="12dp"
+            android:layout_height="wrap_content"
+
+            android:id="@+id/zip"/>
+</LinearLayout>
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/submit"
+        android:layout_gravity="center"
+        android:text="Submit"/>
+</LinearLayout>
+
+
+
+
+
+
+
+
+

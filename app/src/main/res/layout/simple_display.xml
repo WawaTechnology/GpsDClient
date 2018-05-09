@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+     android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="List1"
+        android:padding="8dp"
+        android:layout_alignParentLeft="true"
+        android:id="@+id/custnamedisp"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="8dp"
+        android:layout_alignParentLeft="true"
+        android:id="@+id/customereng"
+        android:layout_below="@id/custnamedisp"
+        android:text="eng"
+
+        />
+
+    <android.support.v7.widget.AppCompatCheckBox
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:layout_alignParentRight="true"
+       android:layout_alignParentEnd="true"
+       android:id="@+id/checkbox"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:id="@+id/delivery_status"
+        android:layout_below="@id/checkbox"
+        android:layout_marginRight="8dp"/>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:layout_below="@id/customereng"
+        android:background="#c0c0c0"/>
+
+
+
+
+
+</RelativeLayout>

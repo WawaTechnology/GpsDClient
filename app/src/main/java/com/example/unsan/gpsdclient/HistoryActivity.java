@@ -87,14 +87,19 @@ public class HistoryActivity extends AppCompatActivity {
         int id = item.getItemId();
         switch (id) {
             case R.id.searchid: {
-                Intent intent = new Intent(HistoryActivity.this, SearchResultsActivity.class);
+              //  Intent intent = new Intent(HistoryActivity.this, SearchResultsActivity.class);
+                //TODO CHANGE IT BACK TO SEARCHRESULTACTIVITY
+                Intent intent=new Intent(HistoryActivity.this,NewDisplayActivity.class);
                 startActivity(intent);
                 break;
 
 
             }
-            case R.id.sortdate:
+            case R.id.addCustomer:
             {
+                Intent intent=new Intent(HistoryActivity.this,AddCustomerActivity.class);
+                startActivity(intent);
+
 
                 break;
 

@@ -30,7 +30,7 @@ public class MainActivity extends AppCompatActivity {
            }
         }
 
-        Intent intent=new Intent(MainActivity.this,HistoryActivity.class);
+        Intent intent=new Intent(MainActivity.this,NewDisplayActivity.class);
         startActivity(intent);
     }
 

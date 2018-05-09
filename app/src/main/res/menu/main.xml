@@ -11,9 +11,22 @@
 
         />
     <item
-        android:id="@+id/sortdate"
-        android:title="Sort By Date"
-        android:text="Sort by Date"
+        android:id="@+id/add_car"
+        android:title="Add Car"
+        app:showAsAction="never"
+        ></item>
+    <item
+        android:id="@+id/addCustomer"
+        android:title="add Customer"
+        android:text="add Customer"
+        app:showAsAction="never"></item>
+    <item android:id="@+id/pdfGenerator"
+        android:title="Generate Pdf"
+        android:text="Generate Pdf"
+        app:showAsAction="never"></item>
+    <item android:id="@+id/assignorder"
+        android:title="Assign Order"
+        android:text="Assign Order"
         app:showAsAction="never"></item>
 
 
