@@ -9,7 +9,8 @@ public class DeliveryDriver {
     String deliveryTime;
     String driverName;
 
-    public DeliveryDriver(String deliveryTime, String deliveryDate, String photo, long timeval, String customer, String destinationAddress, String gpsDestinationAddress, String carNumber,String driverName) {
+
+    public DeliveryDriver(String deliveryTime, String deliveryDate, String photo, long timeval, String customer, String destinationAddress, String gpsDestinationAddress, String carNumber,String driverName,String vehicleNumber) {
         this.deliveryTime = deliveryTime;
         this.deliveryDate = deliveryDate;
         this.photo = photo;
@@ -19,8 +20,9 @@ public class DeliveryDriver {
         this.gpsDestinationAddress = gpsDestinationAddress;
         this.carNumber = carNumber;
         this.driverName=driverName;
+        this.vehicleNumber=vehicleNumber;
     }
-    public DeliveryDriver(String deliveryTime, String deliveryDate, String photo, long timeval, String customer, String destinationAddress, String gpsDestinationAddress, String carNumber) {
+    public DeliveryDriver(String deliveryTime, String deliveryDate, String photo, long timeval, String customer, String destinationAddress, String gpsDestinationAddress, String carNumber,String vehicleNumber) {
         this.deliveryTime = deliveryTime;
         this.deliveryDate = deliveryDate;
         this.photo = photo;
@@ -29,6 +31,7 @@ public class DeliveryDriver {
         this.destinationAddress = destinationAddress;
         this.gpsDestinationAddress = gpsDestinationAddress;
         this.carNumber = carNumber;
+        this.vehicleNumber=vehicleNumber;
 
     }
 
@@ -101,6 +104,14 @@ public class DeliveryDriver {
         this.gpsDestinationAddress = gpsDestinationAddress;
     }
 
+    public String getVehicleNumber() {
+        return vehicleNumber;
+    }
+
+    public void setVehicleNumber(String vehicleNumber) {
+        this.vehicleNumber = vehicleNumber;
+    }
+
     public String getCarNumber() {
         return carNumber;
     }
@@ -116,6 +127,7 @@ public class DeliveryDriver {
     String destinationAddress;
     String gpsDestinationAddress;
     String carNumber;
+    String vehicleNumber;
 
 
 }

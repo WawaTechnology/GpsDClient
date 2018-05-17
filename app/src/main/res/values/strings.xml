@@ -34,6 +34,34 @@
         <item>GBC7432B</item>
         <item>GBG7570P</item>
     </string-array>
+    <string-array name="driverNames">
+        <item>BAI YUNHEE</item>
+        <item>BALAKRISHNAN BALASUBRAMANIAN</item>
+        <item>CHEN QING</item>
+        <item>HUI SHIXIANG</item>
+        <item>KRISHNAMOORTHI VAJAY</item>
+        <item>LI HUAN</item>
+        <item>LIANG DONGCAI</item>
+        <item>LIU BIN</item>
+        <item>LIU CHENG</item>
+        <item>LIU PENG</item>
+        <item>MOHD RIDZWAN BIN SAMORI</item>
+        <item>MUTHUKARUPPAN VELMURUGAN</item>
+        <item>SHAN GUANGMING</item>
+        <item>TIAN JINGDONG</item>
+        <item>WANG CHAO</item>
+        <item>WANG XIAOZHU</item>
+        <item>ZHANG LONG</item>
+        <item>ZHONG ZHAOLEI</item>
+    </string-array>
+    <string-array name="morning_hours">
+        <item>00 am</item>
+        <item>01 am</item>
+        <item>02 am</item>
+        <item>03 am</item>
+        <item>04 am</item>
+        <item>05 am</item>
+    </string-array>
 
 
 </resources>

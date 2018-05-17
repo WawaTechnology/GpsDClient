@@ -68,7 +68,7 @@ class CustomAdapter extends ArrayAdapter<CustomerEngChinese> {
         TextView tv=(TextView)listV.findViewById(R.id.chinese_name);
         TextView engtv=(TextView)listV.findViewById(R.id.english_name);
         tv.setText(customer.getChinese());
-        tv.setText(customer.getEnglish());
+        tv.setText(customer.getEnglish()+"");
 
 
 

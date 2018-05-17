@@ -15,10 +15,19 @@ String chinese;
     public CustomerEngChinese() {
     }
 
-    String english;
+    Object english;
+
+    public Object getEnglish() {
+        return english;
+    }
+
+    public void setEnglish(Object english) {
+        this.english = english;
+    }
 
     public String getChinese() {
         return chinese;
+
     }
 
     public CustomerEngChinese(String chinese, String english) {
@@ -31,11 +40,5 @@ String chinese;
 
     }
 
-    public String getEnglish() {
-        return english;
-    }
 
-    public void setEnglish(String english) {
-        this.english = english;
-    }
 }

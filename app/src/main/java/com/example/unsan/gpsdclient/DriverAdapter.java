@@ -55,10 +55,11 @@ public class DriverAdapter extends RecyclerView.Adapter<DriverAdapter.ViewHolder
         holder.deliverdTo.setText(delivery.destinationAddress);
         holder.reachedTime.setText(delivery.deliveryTime);
         holder.customernm.setText( delivery.customer);
-        holder.gpsLocation.setText(delivery.gpsDestinationAddress);
+       // holder.gpsLocation.setText(delivery.gpsDestinationAddress);
         holder.dateText.setText(delivery.getDeliveryDate());
         holder.carNumber.setText(delivery.carNumber);
         holder.driverName.setText(delivery.driverName);
+        holder.vehicleNum.setText(delivery.vehicleNumber);
         holder.driverName.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -80,7 +81,7 @@ public class DriverAdapter extends RecyclerView.Adapter<DriverAdapter.ViewHolder
 
     class ViewHolder extends RecyclerView.ViewHolder {
 
-        TextView carNumber,reachedTime,customernm,deliverdTo,gpsLocation,dateText,driverName;
+        TextView carNumber,reachedTime,customernm,deliverdTo,dateText,driverName,vehicleNum;
         ImageView prodimage;
         public ViewHolder(View itemView) {
             super(itemView);
@@ -89,10 +90,11 @@ public class DriverAdapter extends RecyclerView.Adapter<DriverAdapter.ViewHolder
             customernm=(itemView).findViewById(R.id.cust_name);
             deliverdTo=(itemView).findViewById(R.id.delivered);
             prodimage=(itemView).findViewById(R.id.prod_img);
-            gpsLocation=(itemView).findViewById(R.id.car_address);
+           // gpsLocation=(itemView).findViewById(R.id.car_address);
             dateText=(itemView).findViewById(R.id.travel_date);
             carNumber=(itemView).findViewById(R.id.car_num);
             driverName=(itemView).findViewById(R.id.driver_name);
+            vehicleNum=(itemView).findViewById(R.id.v_num);
 
         }
     }

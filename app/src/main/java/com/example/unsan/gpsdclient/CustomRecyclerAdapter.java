@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CompoundButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -19,7 +20,10 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -32,8 +36,13 @@ public class CustomRecyclerAdapter extends RecyclerView.Adapter<CustomRecyclerAd
     Context context;
     List<CustomerOrder> objects;
     SimpleDateFormat simpleDateFormat=new SimpleDateFormat("dd-MM-yyyy");
+    SimpleDateFormat simpleDateFormat1=new SimpleDateFormat("HH a");
     Date todayDate = new Date();
     String thisDate ;
+    String hour;
+    List<String> hourList;
+    String hh1;
+
     DatabaseReference customerTodayReference;
     CustomRecyclerAdapter(Context context, List<CustomerOrder> objects)
     {
@@ -41,6 +50,17 @@ public class CustomRecyclerAdapter extends RecyclerView.Adapter<CustomRecyclerAd
         this.objects=objects;
         thisDate= simpleDateFormat.format(todayDate);
         customerTodayReference = FirebaseDatabase.getInstance().getReference("CustomerTodayRecord");
+        hour=simpleDateFormat1.format(todayDate);
+        hh1=hour.substring(3);
+
+
+         hourList=new ArrayList<>();
+        hourList.add("00 am");
+        hourList.add("01 am");
+        hourList.add("02 am");
+        hourList.add("03 am");
+        hourList.add("04 am");
+        hourList.add("05 am");
     }
     @Override
     public CustomRecyclerAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -77,36 +97,64 @@ public class CustomRecyclerAdapter extends RecyclerView.Adapter<CustomRecyclerAd
 
 
 
+
+
        holder.chkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
 
 
                 if (compoundButton.isShown()) {
+                    if(hh1.equals("am")) {
+                        if(hourList.contains(hour))
+                        {
+                            thisDate=getYesterdayDateString();
+                            Log.d("checkDate",thisDate);
+                        }
+
+                    }
+
+
+
+
                     if (compoundButton.isChecked()) {
                         customer.setChecked(true);
 
+                        //TODO change next date
+
+
+
                         customerTodayReference.child(thisDate).child(((AssignOrder) context).carNumber).child(customer.getCustomer()).setValue("Ordered");
 
-                    } else {
-                        AlertDialog.Builder alertDialog = new AlertDialog.Builder(context).setMessage("Are you sure ! You want to cancel the order?").setPositiveButton("YES", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                customerTodayReference.child(thisDate).child(((AssignOrder) context).carNumber).child(customer.getCustomer()).removeValue();
-                                customer.setChecked(false);
+                    }
 
-                            }
-                        }).setNegativeButton("No", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                holder.chkBox.setChecked(true);
-                                customer.setChecked(true);
+                    else {
+                        if(customer.deliveryChecked)
+                        {
+                            Toast.makeText(context,"Cannot cancel Delivered Order",Toast.LENGTH_LONG).show();
+                            holder.chkBox.setChecked(true);
+
+                        }
+                        else {
+
+                            AlertDialog.Builder alertDialog = new AlertDialog.Builder(context).setMessage("Are you sure ! You want to cancel the order?").setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    customerTodayReference.child(thisDate).child(((AssignOrder) context).carNumber).child(customer.getCustomer()).removeValue();
+                                    customer.setChecked(false);
+
+                                }
+                            }).setNegativeButton("No", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    holder.chkBox.setChecked(true);
+                                    customer.setChecked(true);
 
 
-
-                            }
-                        });
-                        alertDialog.show();
+                                }
+                            });
+                            alertDialog.show();
+                        }
 
                     }
                     ((AssignOrder) context).getDeliveryData();
@@ -117,6 +165,15 @@ public class CustomRecyclerAdapter extends RecyclerView.Adapter<CustomRecyclerAd
         });
 
 
+    }
+    private String getYesterdayDateString() {
+        DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+        return dateFormat.format(yesterday());
+    }
+    private Date yesterday() {
+        final Calendar cal = Calendar.getInstance();
+        cal.add(Calendar.DATE, -1);
+        return cal.getTime();
     }
 
     @Override

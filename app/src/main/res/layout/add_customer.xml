@@ -29,6 +29,27 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
 
+
+        android:orientation="horizontal">
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.3"
+            android:textStyle="bold"
+            android:text="English Restaurant Name: "/>
+        <EditText
+            android:layout_marginLeft="12dp"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.5"
+            android:layout_marginRight="12dp"
+
+            android:id="@+id/rest_engname"/>
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+
         android:orientation="horizontal">
         <TextView
             android:layout_width="0dp"
@@ -83,6 +104,7 @@
             android:layout_weight="0.5"
             android:layout_marginRight="12dp"
             android:layout_height="wrap_content"
+            android:text="unk"
 
             android:id="@+id/contact_person"/>
     </LinearLayout>
@@ -104,6 +126,7 @@
             android:layout_marginRight="12dp"
             android:layout_height="wrap_content"
             android:inputType="number"
+            android:text="123456"
 
             android:id="@+id/contact_number"/>
 
@@ -129,6 +152,18 @@
 
             android:id="@+id/zip"/>
 </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Select car Number: "/>
+    <Spinner
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/sp_car"></Spinner>
+    </LinearLayout>
     <Button
         android:layout_width="wrap_content"
         android:layout_marginTop="8dp"

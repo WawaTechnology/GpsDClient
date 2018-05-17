@@ -1,11 +1,19 @@
 package com.example.unsan.gpsdclient;
 
+import android.*;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -15,6 +23,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
@@ -26,9 +36,22 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.itextpdf.text.Document;
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.Font;
+import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.pdf.BaseFont;
+import com.itextpdf.text.pdf.PdfWriter;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -54,6 +77,13 @@ public class AssignOrder extends AppCompatActivity implements AdapterView.OnItem
   int countDelivery,countOrder;
   CustomRecyclerAdapter customRecyclerAdapter;
   int k=1;
+  Button reportButton;
+    final private int REQUEST_CODE_ASK_PERMISSIONS = 111;
+    private File pdfFile;
+    EditText dateText;
+    int CountPreviousOrder,CountPreviousDelivery;
+
+
 
 
 
@@ -70,6 +100,8 @@ public class AssignOrder extends AppCompatActivity implements AdapterView.OnItem
     String vehicleNumber;
     String todayDate;
     List<CustomerOrder> customerOrderList;
+    List<CustomerOrder> previousOrderList;
+    String yesterdayDate;
 
 
 
@@ -88,6 +120,10 @@ public class AssignOrder extends AppCompatActivity implements AdapterView.OnItem
             num_deliveries=(TextView) findViewById(R.id.num_deliveries);
             total_order=(TextView) findViewById(R.id.num_order);
             customerRecyclerView=(RecyclerView) findViewById(R.id.customerRecycler);
+            reportButton=(Button)findViewById(R.id.generate_report);
+            dateText=(EditText) findViewById(R.id.select_dt);
+
+
             // vehicleNumbers=new ArrayList<>();
             FirebaseDatabase fbd=FirebaseDatabase.getInstance();
             driverCarDetails= fbd.getReference("driverCarDb");
@@ -97,6 +133,8 @@ public class AssignOrder extends AppCompatActivity implements AdapterView.OnItem
             driverDataRef=fbd.getReference("Driver");
             customerTodayRef=fbd.getReference("CustomerTodayRecord");
             customerOrderList=new ArrayList<>();
+            previousOrderList=new ArrayList<>();
+
 
 
 
@@ -115,12 +153,12 @@ public class AssignOrder extends AppCompatActivity implements AdapterView.OnItem
 
 
 
-            customerReference=fbd.getReference("CarsDb");
-            customerReference.keepSynced(true);
+            customerReference=fbd.getReference("carsRecord");
 
-            SimpleDateFormat simpleDateFormat=new SimpleDateFormat("dd-MM-yyyy");
-            Date today = new Date();
-            todayDate=simpleDateFormat.format(today);
+
+
+
+
 
             //carNumbers=new ArrayList<>();
             //ADD vehicle number
@@ -157,7 +195,22 @@ public class AssignOrder extends AppCompatActivity implements AdapterView.OnItem
             LinearLayoutManager linearLayoutManager=new LinearLayoutManager(AssignOrder.this,LinearLayoutManager.VERTICAL,false);
             customerRecyclerView.setLayoutManager(linearLayoutManager);
 
+
             pgbar.setVisibility(View.VISIBLE);
+            reportButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    try {
+                        createPdfWrapper();
+                    } catch (FileNotFoundException e) {
+                        e.printStackTrace();
+                    } catch (DocumentException e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+            yesterdayDate=getYesterdayDateString();
+           // getCustomerData();
 
 
 
@@ -165,6 +218,231 @@ public class AssignOrder extends AppCompatActivity implements AdapterView.OnItem
 
 
         }
+    private String getYesterdayDateString() {
+        DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+        return dateFormat.format(yesterday());
+    }
+    public static Font setChineseFont() {
+        BaseFont bf = null;
+        Font fontChinese = null;
+        try {
+            bf = BaseFont.createFont("STSong-Light", "UniGB-UCS2-H", BaseFont.NOT_EMBEDDED);
+            fontChinese = new Font(bf, 10, Font.NORMAL);
+        } catch (DocumentException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return fontChinese;
+    }
+
+
+    private void createPdfWrapper() throws FileNotFoundException,DocumentException{
+
+        int hasWriteStoragePermission = ActivityCompat.checkSelfPermission(this, android.Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        if (hasWriteStoragePermission != PackageManager.PERMISSION_GRANTED) {
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                if (!shouldShowRequestPermissionRationale(android.Manifest.permission.WRITE_CONTACTS)) {
+                    showMessageOKCancel("You need to allow access to Storage",
+                            new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                                        requestPermissions(new String[]{android.Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                                                REQUEST_CODE_ASK_PERMISSIONS);
+                                    }
+                                }
+                            });
+                    return;
+                }
+
+
+                requestPermissions(new String[]{android.Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                        REQUEST_CODE_ASK_PERMISSIONS);
+            }
+            return;
+        }else {
+            getPreviousOrder();
+        }
+    }
+    private void showMessageOKCancel(String message, DialogInterface.OnClickListener okListener) {
+        new AlertDialog.Builder(this)
+                .setMessage(message)
+                .setPositiveButton("OK", okListener)
+                .setNegativeButton("Cancel", null)
+                .create()
+                .show();
+    }
+    private Date yesterday() {
+        final Calendar cal = Calendar.getInstance();
+        cal.add(Calendar.DATE, -1);
+        return cal.getTime();
+    }
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        switch (requestCode) {
+            case REQUEST_CODE_ASK_PERMISSIONS:
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    // Permission Granted
+                    try {
+                        createPdfWrapper();
+                    } catch (FileNotFoundException e) {
+                        e.printStackTrace();
+                    } catch (DocumentException e) {
+                        e.printStackTrace();
+                    }
+                } else {
+                    // Permission Denied
+                    Toast.makeText(this, "WRITE_EXTERNAL Permission Denied", Toast.LENGTH_SHORT)
+                            .show();
+                }
+                break;
+            default:
+                super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
+    }
+    private void createPdf() throws FileNotFoundException, DocumentException {
+
+
+        File docsFolder = new File(Environment.getExternalStorageDirectory() + "/Documents");
+        if (!docsFolder.exists()) {
+            docsFolder.mkdir();
+            Log.i("TAG", "Created a new directory for PDF");
+        }
+
+        pdfFile = new File(docsFolder.getAbsolutePath(),"Delivery.pdf");
+        OutputStream output = new FileOutputStream(pdfFile);
+        Document document = new Document();
+        PdfWriter.getInstance(document, output);
+        document.open();
+        String dt=yesterdayDate;
+        if(dateText.getText().toString().length()>0)
+        {
+            dt=dateText.getText().toString();
+        }
+        document.add(new Paragraph("Date: "+dt));
+        document.add(new Paragraph("Car Number: "+carNumber));
+        Log.d("inpdf",CountPreviousDelivery+"");
+
+        document.add(new Paragraph("Total Deliveries: "+CountPreviousDelivery));
+        document.add(new Paragraph("Total Order: "+CountPreviousOrder));
+        if(previousOrderList!=null&&previousOrderList.size()>0) {
+            for (CustomerOrder order : previousOrderList) {
+                if (order.deliveryChecked) {
+                    document.add(new Paragraph(order.getEngCustomerName() + "        " + "delivered",setChineseFont()));
+                }
+                else {
+                    if (order.checked) {
+                        document.add(new Paragraph(order.getEngCustomerName() + "        " + "waiting",setChineseFont()));
+                    }
+                }
+            }
+        }
+
+        document.close();
+        previewPdf();
+
+    }
+
+    private void getPreviousOrder() throws FileNotFoundException, DocumentException {
+            previousOrderList.clear();
+        CountPreviousOrder=0;
+        CountPreviousDelivery=0;
+        String dtSearch=yesterdayDate;
+           //String yesterday= getYesterdayDateString();
+        if(dateText.getText().toString().length()>0)
+        {
+            dtSearch=dateText.getText().toString();
+        }
+
+            for( CustomerOrder co:customerOrderList)
+            {
+                final CustomerOrder ct=new CustomerOrder(co.getCustomer(),co.getEngCustomerName(),false,false);
+
+                String customer=ct.getCustomer();
+
+                customerTodayRef.child(dtSearch).child(carNumber).child(customer).addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+
+                        if(dataSnapshot.exists())
+                        {
+                            Log.d("prevdatasnapshot","exists");
+
+                            ct.checked=true;
+                            String val=dataSnapshot.getValue(String.class);
+                            Log.d("ckv",val);
+                            if(dataSnapshot.getValue().equals("Ordered"))
+                            {
+                                CountPreviousOrder+=1;
+
+                            }
+                            else
+                            {
+                                CountPreviousDelivery+=1;
+                                ct.deliveryChecked=true;
+                                Log.d("prevdeliverycount",CountPreviousDelivery+"");
+                            }
+
+
+
+
+                        }
+                        else {
+                            ct.checked = false;
+
+                        }
+                        previousOrderList.add(ct);
+                        if(previousOrderList.size()==customerOrderList.size())
+                        {
+                            try {
+                                createPdf();
+                            } catch (FileNotFoundException e) {
+                                e.printStackTrace();
+                            } catch (DocumentException e) {
+                                e.printStackTrace();
+                            }
+                        }
+
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
+            }
+
+
+
+
+            }
+
+
+    private void previewPdf() {
+
+        PackageManager packageManager = getPackageManager();
+        Intent testIntent = new Intent(Intent.ACTION_VIEW);
+        testIntent.setType("application/pdf");
+        List list = packageManager.queryIntentActivities(testIntent, PackageManager.MATCH_DEFAULT_ONLY);
+        if (list.size() > 0) {
+            Intent intent = new Intent();
+            intent.setAction(Intent.ACTION_VIEW);
+            // Uri uri = Uri.fromFile(pdfFile);
+            Uri uri = FileProvider.getUriForFile(AssignOrder.this, BuildConfig.APPLICATION_ID + ".provider",pdfFile);
+            intent.setDataAndType(uri, "application/pdf");
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+
+            startActivity(intent);
+        }else{
+            Toast.makeText(this,"Download a PDF Viewer to see the generated PDF",Toast.LENGTH_SHORT).show();
+        }
+    }
+
 
    /* private void addVehicleNumbers() {
         vehicleNumbers.add("YP2095H");
@@ -193,7 +471,7 @@ public class AssignOrder extends AppCompatActivity implements AdapterView.OnItem
         {
             super.onResume();
             Log.d("tag","onresume");
-            getCustomerData();
+
 
 
 
@@ -239,11 +517,41 @@ public class AssignOrder extends AppCompatActivity implements AdapterView.OnItem
             countDelivery=0;
             countOrder=0;
            final int len=customerOrderList.size();
+           Log.d("checkcustomerLSize",len+"");
             k=1;
+            SimpleDateFormat simpleDateFormat=new SimpleDateFormat("dd-MM-yyyy");
+            SimpleDateFormat sf=new SimpleDateFormat("HH a");
+            Date today = new Date();
+            todayDate=simpleDateFormat.format(today);
+            String hho=sf.format(today);
+            String hh1= hho.substring(3);
+            Log.d("checkam",hh1);
+            Log.d("checkh",hho);
+
+
+           // String yester=getYesterdayDateString();
+           // Log.d("getyes",yester);
+
+           if(hh1.equals("am")) {
+               List<String> hourList=new ArrayList<>();
+               hourList.add("00 am");
+               hourList.add("01 am");
+               hourList.add("02 am");
+               hourList.add("03 am");
+               hourList.add("04 am");
+               hourList.add("05 am");
+               if(hourList.contains(hho))
+               {
+                   todayDate=getYesterdayDateString();
+               }
+
+
+           }
           for(final CustomerOrder customerOrder:customerOrderList)
           {
 
               String customer=customerOrder.getCustomer();
+              //checktime here and set to previous date
               customerTodayRef.child(todayDate).child(carNumber).child(customer).addListenerForSingleValueEvent(new ValueEventListener() {
                   @Override
                   public void onDataChange(DataSnapshot dataSnapshot) {
@@ -297,28 +605,28 @@ public class AssignOrder extends AppCompatActivity implements AdapterView.OnItem
 
     private void getCustomerData() {
         Log.d("chksee","we are here");
+        customerOrderList.clear();
+        customRecyclerAdapter.notifyDataSetChanged();
 
 
-       customerReference.child(carNumber).child("Restaurants").addListenerForSingleValueEvent(new ValueEventListener() {
+       customerReference.child(carNumber).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 Log.d("checkk","here");
 
-                customerOrderList.clear();
+
                 if(dataSnapshot.hasChildren()) {
 
 
                     for (DataSnapshot ds : dataSnapshot.getChildren()) {
-                        String key = ds.getKey();
-                        Log.d("checkkey", key);
-                        Object valueobj=ds.getValue(Object.class);
-                        String value=valueobj.toString();
+                        CustomerEngChinese customerEngChinese= ds.getValue(CustomerEngChinese.class);
 
 
-                        customerOrderList.add(new CustomerOrder(key,value,false,false));
+                        customerOrderList.add(new CustomerOrder(customerEngChinese.chinese,customerEngChinese.english.toString(),false,false));
 
 
                     }
+                        Log.d("orderlistsizefunc1",customerOrderList.size()+"");
                     getDeliveryData();
                     pgbar.setVisibility(GONE);
 
@@ -343,6 +651,7 @@ public class AssignOrder extends AppCompatActivity implements AdapterView.OnItem
     }
 
 
+
         public void onPause()
         {
             super.onPause();
@@ -357,12 +666,7 @@ public class AssignOrder extends AppCompatActivity implements AdapterView.OnItem
 
 
         }
-        @Override
-        public void onBackPressed() {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-                finishAffinity();
-            }
-        }
+
 
 
         public void onRestart()
@@ -384,7 +688,7 @@ public class AssignOrder extends AppCompatActivity implements AdapterView.OnItem
                 case R.id.sp1: { // code for first spinner. Depending on spinner.getselecteditem assign adapter to second spinner
                     carNumber = adapterView.getItemAtPosition(i).toString();
                     getCustomerData();
-                    getDeliveryData();
+                   // getDeliveryData();
                    // getTotalDeliveryCount();
 
 
@@ -410,4 +714,5 @@ public class AssignOrder extends AppCompatActivity implements AdapterView.OnItem
         public void onNothingSelected(AdapterView<?> adapterView) {
 
         }
+
     }

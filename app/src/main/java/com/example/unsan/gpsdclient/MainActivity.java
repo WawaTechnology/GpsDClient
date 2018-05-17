@@ -23,10 +23,11 @@ public class MainActivity extends AppCompatActivity {
             // Log.d("checkpermission"," "+permissionCheck);
 
            int permission= checkSelfPermission(Manifest.permission.CALL_PHONE);
+           int permissionfile=checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE);
            Log.d("getpermissiom",""+permission);
-           if(permission<=0)
+           if(permission<=0||permissionfile<=0)
            {
-               requestPermissions(new String[]{Manifest.permission.CALL_PHONE},permCheck);
+               requestPermissions(new String[]{Manifest.permission.CALL_PHONE,Manifest.permission.WRITE_EXTERNAL_STORAGE },permCheck);
            }
         }
 

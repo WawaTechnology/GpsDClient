@@ -123,7 +123,7 @@ public class NewDisplayActivity extends AppCompatActivity implements SwipeRefres
             }
             case R.id.pdfGenerator:
             {
-                Intent intent=new Intent(NewDisplayActivity.this,DisplayCustomer.class);
+                Intent intent=new Intent(NewDisplayActivity.this,PdfGeneratorActivity.class);
                 startActivity(intent);
                 break;
 

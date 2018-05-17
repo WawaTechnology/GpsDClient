@@ -3,6 +3,7 @@ package com.example.unsan.gpsdclient;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -41,10 +42,12 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
         holder.deliverdTo.setText(delivery.destinationAddress);
         holder.reachedTime.setText(delivery.deliveryTime);
         holder.customernm.setText( delivery.customer);
-        holder.gpsLocation.setText(delivery.gpsDestinationAddress);
+       // holder.gpsLocation.setText(delivery.gpsDestinationAddress);
         holder.dateText.setText(delivery.getDeliveryDate());
         holder.carNumber.setText(delivery.carNumber);
         holder.driverName.setText(delivery.driverName);
+        Log.d("checkvnum",delivery.vehicleNumber);
+        holder.vehicleNumber.setText(delivery.vehicleNumber);
         holder.driverName.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -53,6 +56,8 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
                 context.startActivity(intent);
             }
         });
+
+
         String photo= delivery.getPhoto();
         Glide.with(context)
                 .load(photo)
@@ -68,7 +73,7 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
 
     class ViewHolder extends RecyclerView.ViewHolder {
 
-        TextView carNumber,reachedTime,customernm,deliverdTo,gpsLocation,dateText,driverName;
+        TextView carNumber,reachedTime,customernm,deliverdTo,dateText,driverName,vehicleNumber;
         ImageView prodimage;
         public ViewHolder(View itemView) {
             super(itemView);
@@ -77,10 +82,11 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.ViewHold
             customernm=(itemView).findViewById(R.id.cust_name);
             deliverdTo=(itemView).findViewById(R.id.delivered);
             prodimage=(itemView).findViewById(R.id.prod_img);
-            gpsLocation=(itemView).findViewById(R.id.car_address);
+           // gpsLocation=(itemView).findViewById(R.id.car_address);
             dateText=(itemView).findViewById(R.id.travel_date);
             carNumber=(itemView).findViewById(R.id.car_num);
             driverName=(itemView).findViewById(R.id.driver_name);
+            vehicleNumber=(itemView).findViewById(R.id.v_num);
 
         }
     }
