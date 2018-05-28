@@ -1,6 +1,7 @@
 package com.example.unsan.gpsdclient;
 
 import android.*;
+import android.app.DatePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -24,6 +25,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.ProgressBar;
@@ -62,7 +64,9 @@ import static android.view.View.GONE;
  * Created by Unsan on 7/5/18.
  */
 
-public class AssignOrder extends AppCompatActivity implements AdapterView.OnItemSelectedListener{
+public class AssignOrder extends AppCompatActivity implements AdapterView.OnItemSelectedListener
+
+{
 
 
     //ListView listView,alphaViewList;
@@ -82,6 +86,10 @@ public class AssignOrder extends AppCompatActivity implements AdapterView.OnItem
     private File pdfFile;
     EditText dateText;
     int CountPreviousOrder,CountPreviousDelivery;
+    DatabaseReference customerDeliveryRef;
+    int totalcount;
+    DatePickerDialog datePickerDialog;
+
 
 
 
@@ -100,7 +108,7 @@ public class AssignOrder extends AppCompatActivity implements AdapterView.OnItem
     String vehicleNumber;
     String todayDate;
     List<CustomerOrder> customerOrderList;
-    List<CustomerOrder> previousOrderList;
+    List<CustomerDeliveryDetail> previousOrderList;
     String yesterdayDate;
 
 
@@ -128,12 +136,36 @@ public class AssignOrder extends AppCompatActivity implements AdapterView.OnItem
             FirebaseDatabase fbd=FirebaseDatabase.getInstance();
             driverCarDetails= fbd.getReference("driverCarDb");
             carsDbRef=fbd.getReference("CarsDb");
+            customerDeliveryRef=fbd.getReference("DriverDelivery");
 
 
             driverDataRef=fbd.getReference("Driver");
             customerTodayRef=fbd.getReference("CustomerTodayRecord");
             customerOrderList=new ArrayList<>();
             previousOrderList=new ArrayList<>();
+            dateText.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Calendar c=Calendar.getInstance();
+                    int date=c.get(Calendar.DAY_OF_MONTH);
+                    int month=c.get(Calendar.MONTH);
+                    int year=c.get(Calendar.YEAR);
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                        datePickerDialog=new DatePickerDialog(AssignOrder.this, new DatePickerDialog.OnDateSetListener() {
+                            @Override
+                            public void onDateSet(DatePicker datePicker, int i, int i1, int i2) {
+                                i1+=1;
+                                dateText.setText(i2+"-"+(i1<10?("0"+i1):i1)+"-"+i);
+
+
+
+                            }
+                        },year,month,date);
+                        datePickerDialog.show();
+                    }
+
+                }
+            });
 
 
 
@@ -328,16 +360,18 @@ public class AssignOrder extends AppCompatActivity implements AdapterView.OnItem
         Log.d("inpdf",CountPreviousDelivery+"");
 
         document.add(new Paragraph("Total Deliveries: "+CountPreviousDelivery));
-        document.add(new Paragraph("Total Order: "+CountPreviousOrder));
+        document.add(new Paragraph("Total Order Waiting: "+CountPreviousOrder));
+        int index=0;
         if(previousOrderList!=null&&previousOrderList.size()>0) {
-            for (CustomerOrder order : previousOrderList) {
-                if (order.deliveryChecked) {
-                    document.add(new Paragraph(order.getEngCustomerName() + "        " + "delivered",setChineseFont()));
+            for (CustomerDeliveryDetail order : previousOrderList) {
+                index+=1;
+                if (order.getTime()!=null) {
+                    document.add(new Paragraph(index+"  "+order.getCustomer() + "        " + "delivered"+"       "+"Time: "+order.getTime(),setChineseFont()));
                 }
                 else {
-                    if (order.checked) {
-                        document.add(new Paragraph(order.getEngCustomerName() + "        " + "waiting",setChineseFont()));
-                    }
+
+                        document.add(new Paragraph(index+"  "+order.getCustomer() + "        " + "waiting",setChineseFont()));
+
                 }
             }
         }
@@ -351,61 +385,64 @@ public class AssignOrder extends AppCompatActivity implements AdapterView.OnItem
             previousOrderList.clear();
         CountPreviousOrder=0;
         CountPreviousDelivery=0;
+        totalcount=0;
+
+
+        //default setting date to yesterday
         String dtSearch=yesterdayDate;
            //String yesterday= getYesterdayDateString();
+        //if date is given in editbox
         if(dateText.getText().toString().length()>0)
         {
             dtSearch=dateText.getText().toString();
         }
 
-            for( CustomerOrder co:customerOrderList)
-            {
-                final CustomerOrder ct=new CustomerOrder(co.getCustomer(),co.getEngCustomerName(),false,false);
 
-                String customer=ct.getCustomer();
-
-                customerTodayRef.child(dtSearch).child(carNumber).child(customer).addListenerForSingleValueEvent(new ValueEventListener() {
+                customerTodayRef.child(dtSearch).child(carNumber).addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
 
-                        if(dataSnapshot.exists())
-                        {
-                            Log.d("prevdatasnapshot","exists");
 
-                            ct.checked=true;
-                            String val=dataSnapshot.getValue(String.class);
-                            Log.d("ckv",val);
-                            if(dataSnapshot.getValue().equals("Ordered"))
-                            {
-                                CountPreviousOrder+=1;
+                        if (dataSnapshot.exists()) {
+                            Log.d("prevdatasnapshot", "exists");
+                             totalcount=(int)dataSnapshot.getChildrenCount();
+                             Log.d("checktota",totalcount+"");
+
+                            for (DataSnapshot ds : dataSnapshot.getChildren()) {
+
+
+
+                                 String customer = ds.getKey();
+                                String val = ds.getValue(String.class);
+                                if (val.equals("Ordered")) {
+                                    CountPreviousOrder += 1;
+                                    CustomerDeliveryDetail customerDeliveryDetail = new CustomerDeliveryDetail(customer, null);
+                                    previousOrderList.add(customerDeliveryDetail);
+
+                                } else {
+                                    CountPreviousDelivery += 1;
+                                    previousOrderList.add(new CustomerDeliveryDetail(customer,val));
+
+
+
+
+                                }
+                                Log.d("checkprepsize",previousOrderList.size()+"");
+
+                                try {
+                                    if(previousOrderList.size()==totalcount)
+                                        createPdf();
+                                } catch (FileNotFoundException e) {
+                                    e.printStackTrace();
+                                } catch (DocumentException e) {
+                                    e.printStackTrace();
+                                }
+
+
 
                             }
-                            else
-                            {
-                                CountPreviousDelivery+=1;
-                                ct.deliveryChecked=true;
-                                Log.d("prevdeliverycount",CountPreviousDelivery+"");
-                            }
-
-
-
-
                         }
-                        else {
-                            ct.checked = false;
 
-                        }
-                        previousOrderList.add(ct);
-                        if(previousOrderList.size()==customerOrderList.size())
-                        {
-                            try {
-                                createPdf();
-                            } catch (FileNotFoundException e) {
-                                e.printStackTrace();
-                            } catch (DocumentException e) {
-                                e.printStackTrace();
-                            }
-                        }
 
                     }
 
@@ -414,12 +451,7 @@ public class AssignOrder extends AppCompatActivity implements AdapterView.OnItem
 
                     }
                 });
-            }
-
-
-
-
-            }
+    }
 
 
     private void previewPdf() {
@@ -716,3 +748,4 @@ public class AssignOrder extends AppCompatActivity implements AdapterView.OnItem
         }
 
     }
+

@@ -31,11 +31,13 @@ import java.util.List;
 public class SearchResultsActivity extends AppCompatActivity {
     ListView lvw;
     TextView tvw;
-    HistoryAdapter historyitemAdapter;
+    DriverAdapter historyitemAdapter;
 
-    List<DeliveryDriver> deliveryList;
+    List<DriverDelivery> deliveryList;
+    List<String> imgsList;
     RecyclerView rcview;
-    DatabaseReference restaurantReference;
+    String img;
+    DatabaseReference restaurantReference,imageDb;
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
@@ -44,8 +46,11 @@ public class SearchResultsActivity extends AppCompatActivity {
         tvw=(TextView)findViewById(R.id.noResult);
 
         deliveryList=new ArrayList<>();
-        restaurantReference= FirebaseDatabase.getInstance().getReference("deliveryDriver");
-        historyitemAdapter=new HistoryAdapter(SearchResultsActivity.this,deliveryList);
+        imgsList=new ArrayList<>();
+        FirebaseDatabase fbd=FirebaseDatabase.getInstance();
+        restaurantReference= fbd.getReference("DriverDelivery");
+        imageDb=fbd.getReference("imgReferences");
+        historyitemAdapter=new DriverAdapter(SearchResultsActivity.this,deliveryList,imgsList);
         rcview.setAdapter(historyitemAdapter);
         LinearLayoutManager linearLayoutManager=new LinearLayoutManager(SearchResultsActivity.this, LinearLayoutManager.VERTICAL,false);
         rcview.setLayoutManager(linearLayoutManager);
@@ -77,7 +82,7 @@ public class SearchResultsActivity extends AppCompatActivity {
 
                         for(DataSnapshot ds:dataSnapshot.getChildren())
                         {
-                            DeliveryDriver dr=ds.getValue(DeliveryDriver.class);
+                            DriverDelivery dr=ds.getValue(DriverDelivery.class);
 
                             String key=dr.getCustomer();
                             if(key.toLowerCase().contains(query.toLowerCase()))
@@ -87,8 +92,9 @@ public class SearchResultsActivity extends AppCompatActivity {
                                 Log.d("checkkey",key);
 
                                 deliveryList.add(dr);
+                                img= getImage(key);
 
-                                historyitemAdapter.notifyDataSetChanged();
+
                                 tvw.setVisibility(View.GONE);
                             }
 
@@ -115,6 +121,28 @@ public class SearchResultsActivity extends AppCompatActivity {
         });
 
         return super.onCreateOptionsMenu(menu);
+    }
+    private String getImage(String key) {
+        Log.d("checkkey",key);
+
+        imageDb.child(key).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                img= (String)dataSnapshot.getValue();
+
+                imgsList.add(img);
+                historyitemAdapter.notifyDataSetChanged();
+
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+        return img;
+
     }
 
 }

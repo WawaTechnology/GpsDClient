@@ -42,6 +42,7 @@ public class CustomRecyclerAdapter extends RecyclerView.Adapter<CustomRecyclerAd
     String hour;
     List<String> hourList;
     String hh1;
+    DatabaseReference carsRecordReference;
 
     DatabaseReference customerTodayReference;
     CustomRecyclerAdapter(Context context, List<CustomerOrder> objects)
@@ -50,6 +51,7 @@ public class CustomRecyclerAdapter extends RecyclerView.Adapter<CustomRecyclerAd
         this.objects=objects;
         thisDate= simpleDateFormat.format(todayDate);
         customerTodayReference = FirebaseDatabase.getInstance().getReference("CustomerTodayRecord");
+        carsRecordReference=FirebaseDatabase.getInstance().getReference("carsRecord");
         hour=simpleDateFormat1.format(todayDate);
         hh1=hour.substring(3);
 
@@ -121,6 +123,9 @@ public class CustomRecyclerAdapter extends RecyclerView.Adapter<CustomRecyclerAd
                         customer.setChecked(true);
 
                         //TODO change next date
+
+
+
 
 
 

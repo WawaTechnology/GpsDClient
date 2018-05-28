@@ -23,11 +23,12 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Select Date:"/>
-        <DatePicker
+            android:text="Enter Date:"/>
+        <EditText
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/date_picker"></DatePicker>
+            android:hint="dd-mm-yyyy"
+            android:id="@+id/ent_dt"></EditText>
     </LinearLayout>
     <Button
         android:layout_width="wrap_content"

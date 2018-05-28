@@ -9,8 +9,12 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import com.google.firebase.database.DataSnapshot;
@@ -37,11 +41,13 @@ public class DriverActivity extends AppCompatActivity implements SwipeRefreshLay
     DatabaseReference driverDayDatabase,driverDeliveryReference;
     ValueEventListener valueEventListener;
     SwipeRefreshLayout swipeRefreshLayout;
+    Button getRecordButton;
 
 
     DatabaseReference imgReference;
     List<String> imgList;
     List<DriverDelivery> driverDeliveryList;
+    EditText dtSelect;
 
     DayRecordAdapter dayRecordAdapter;
     String dateString;
@@ -53,6 +59,8 @@ public class DriverActivity extends AppCompatActivity implements SwipeRefreshLay
         pNumber = (TextView) findViewById(R.id.phone);
         recycler_driver=(RecyclerView) findViewById(R.id.recycler_today);
         swipeRefreshLayout=(SwipeRefreshLayout) findViewById(R.id.swipe_refresh);
+        getRecordButton=(Button)findViewById(R.id.get_record);
+        dtSelect=(EditText) findViewById(R.id.dtselect);
         driverDeliveryList=new ArrayList<>();
         driverRef = FirebaseDatabase.getInstance().getReference("Driver");
         driverDayDatabase= FirebaseDatabase.getInstance().getReference("driverDayRecord");
@@ -65,9 +73,11 @@ public class DriverActivity extends AppCompatActivity implements SwipeRefreshLay
         recycler_driver.setAdapter(dayRecordAdapter);
         Intent intent = getIntent();
         driver = intent.getStringExtra("drivername");
+
         SimpleDateFormat simpleDateFormat=new SimpleDateFormat("dd-MM-yyyy");
         Date today=new Date();
-        dateString=simpleDateFormat.format(today);
+        dateString = simpleDateFormat.format(today);
+
         swipeRefreshLayout.setEnabled(true);
         swipeRefreshLayout.setOnRefreshListener(this);
 
@@ -85,6 +95,23 @@ public class DriverActivity extends AppCompatActivity implements SwipeRefreshLay
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+        dtSelect.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
 
             }
         });
@@ -106,7 +133,16 @@ public class DriverActivity extends AppCompatActivity implements SwipeRefreshLay
                 startActivity(intent);
             }
         });
-        getDeliveries();
+
+        getRecordButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                getDeliveries();
+
+            }
+        });
+
+
 
 
 
@@ -115,6 +151,12 @@ public class DriverActivity extends AppCompatActivity implements SwipeRefreshLay
     private void getDeliveries() {
         imgList.clear();
         driverDeliveryList.clear();
+        if(dtSelect.getText().toString().length()>0)
+        {
+            dateString=dtSelect.getText().toString();
+        }
+
+        Log.d("checkdate",dateString);
         valueEventListener=driverDayDatabase.child(dateString).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
