@@ -7,7 +7,17 @@ package com.example.unsan.gpsdclient;
 public class CustomerOrder {
     String customer;
     String engCustomerName;
+    int order;
     boolean checked;
+
+    public int getOrder() {
+        return order;
+    }
+
+    public void setOrder(int order) {
+        this.order = order;
+    }
+
     boolean deliveryChecked;
 
     public boolean isDeliveryChecked() {
@@ -27,12 +37,13 @@ public class CustomerOrder {
         this.engCustomerName = engCustomerName;
     }
 
-    public CustomerOrder(String customer, String engCustomerName, boolean checked,boolean deliveryChecked) {
+    public CustomerOrder(String customer, String engCustomerName, boolean checked,boolean deliveryChecked,int order) {
         this.customer = customer;
         this.engCustomerName=engCustomerName;
 
         this.checked = checked;
         this.deliveryChecked=deliveryChecked;
+        this.order=order;
     }
 
     public String getCustomer() {

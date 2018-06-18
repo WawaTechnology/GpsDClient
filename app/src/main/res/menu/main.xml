@@ -10,11 +10,7 @@
         app:showAsAction="always"
 
         />
-    <item
-        android:id="@+id/add_car"
-        android:title="Add Car"
-        app:showAsAction="never"
-        ></item>
+
     <item
         android:id="@+id/addCustomer"
         android:title="add Customer"

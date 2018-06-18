@@ -51,11 +51,12 @@ public class AddCustomerActivity extends AppCompatActivity implements AdapterVie
         arrayAdapter=new ArrayAdapter<String>(AddCustomerActivity.this,R.layout.spinner_item,getResources().getStringArray(R.array.carArray));
         carSpinner.setAdapter(arrayAdapter);
         carSpinner.setOnItemSelectedListener(AddCustomerActivity.this);
+        cityText.setText("Singapore");
 
 
         firebaseDatabase=FirebaseDatabase.getInstance();
         customerRef=firebaseDatabase.getReference("Customer");
-        cardbref=firebaseDatabase.getReference("carsRecord");
+        cardbref=firebaseDatabase.getReference("CarsDb");
         contactNumberText.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -90,16 +91,15 @@ public class AddCustomerActivity extends AppCompatActivity implements AdapterVie
                         cardbref.child(carNumber).addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
                             public void onDataChange(DataSnapshot dataSnapshot) {
-                               long count= dataSnapshot.getChildrenCount();
-                               count=count+1;
+                              // long count= dataSnapshot.getChildrenCount();
+                              // count=count+1;
 
-                               cardbref.child(carNumber).child(count+"").setValue(new CustomerEngChinese(restaurant,engrestname.getText().toString()));
+                               cardbref.child(carNumber).child("Restaurants").child(restaurant).setValue(engrestname.getText().toString());
                                 restName.setText("");
                                 addressText.setText("");
-                                cityText.setText("");
+
                                 zipText.setText("");
-                                contactPText.setText("");
-                                contactNumberText.setText("");
+
                                 engrestname.setText("");
                                 Toast.makeText(AddCustomerActivity.this,"Customer record added",Toast.LENGTH_LONG).show();
                             }

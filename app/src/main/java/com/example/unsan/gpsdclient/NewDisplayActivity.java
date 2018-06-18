@@ -112,15 +112,7 @@ public class NewDisplayActivity extends AppCompatActivity implements SwipeRefres
                 break;
 
             }
-            case R.id.add_car:
-            {
-                Intent intent=new Intent(NewDisplayActivity.this,AssignCarCustomer.class);
-                startActivity(intent);
 
-
-                break;
-
-            }
             case R.id.pdfGenerator:
             {
                 Intent intent=new Intent(NewDisplayActivity.this,PdfGeneratorActivity.class);

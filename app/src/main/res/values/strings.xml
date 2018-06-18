@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">GpsDClient</string>
+    <string name="app_name">Manager</string>
     <string name="search"></string>
     <string name="no_result">No Result Found</string>
     <string-array name="carArray">

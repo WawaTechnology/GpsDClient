@@ -11,6 +11,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.constraint.solver.widgets.Snapshot;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.ActionBar;
@@ -55,6 +56,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Map;
 
@@ -79,6 +81,7 @@ public class AssignOrder extends AppCompatActivity implements AdapterView.OnItem
     ValueEventListener valueEventListener,dvEventListner;
     TextView num_deliveries,total_order;
   int countDelivery,countOrder;
+  //Button clearButton;
   CustomRecyclerAdapter customRecyclerAdapter;
   int k=1;
   Button reportButton;
@@ -130,6 +133,7 @@ public class AssignOrder extends AppCompatActivity implements AdapterView.OnItem
             customerRecyclerView=(RecyclerView) findViewById(R.id.customerRecycler);
             reportButton=(Button)findViewById(R.id.generate_report);
             dateText=(EditText) findViewById(R.id.select_dt);
+            //clearButton=(Button) findViewById(R.id.clear);
 
 
             // vehicleNumbers=new ArrayList<>();
@@ -176,6 +180,7 @@ public class AssignOrder extends AppCompatActivity implements AdapterView.OnItem
 
             actionBar=getSupportActionBar();
             actionBar.setDisplayShowTitleEnabled(false);
+
 
 
 
@@ -242,6 +247,28 @@ public class AssignOrder extends AppCompatActivity implements AdapterView.OnItem
                 }
             });
             yesterdayDate=getYesterdayDateString();
+           /* clearButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    customerReference.child(carNumber).addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            for(DataSnapshot ds:dataSnapshot.getChildren())
+                            {
+                                CustomerEngChinese customerEngChinese= ds.getValue(CustomerEngChinese.class);
+                                carsDbRef.child(carNumber).child("Restaurants").child(customerEngChinese.chinese).setValue(customerEngChinese.english);
+
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+
+                        }
+                    });
+                }
+            });
+            */
            // getCustomerData();
 
 
@@ -313,6 +340,7 @@ public class AssignOrder extends AppCompatActivity implements AdapterView.OnItem
         cal.add(Calendar.DATE, -1);
         return cal.getTime();
     }
+
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         switch (requestCode) {
@@ -413,7 +441,8 @@ public class AssignOrder extends AppCompatActivity implements AdapterView.OnItem
 
 
                                  String customer = ds.getKey();
-                                String val = ds.getValue(String.class);
+                                OrderStatus orderStatus = ds.getValue(OrderStatus.class);
+                                String val=orderStatus.getStatus();
                                 if (val.equals("Ordered")) {
                                     CountPreviousOrder += 1;
                                     CustomerDeliveryDetail customerDeliveryDetail = new CustomerDeliveryDetail(customer, null);
@@ -505,8 +534,6 @@ public class AssignOrder extends AppCompatActivity implements AdapterView.OnItem
             Log.d("tag","onresume");
 
 
-
-
         }
 
 
@@ -579,10 +606,13 @@ public class AssignOrder extends AppCompatActivity implements AdapterView.OnItem
 
 
            }
+           //checkNewDate(todayDate);
+
+
           for(final CustomerOrder customerOrder:customerOrderList)
           {
 
-              String customer=customerOrder.getCustomer();
+             final String customer=customerOrder.getCustomer();
               //checktime here and set to previous date
               customerTodayRef.child(todayDate).child(carNumber).child(customer).addListenerForSingleValueEvent(new ValueEventListener() {
                   @Override
@@ -591,9 +621,11 @@ public class AssignOrder extends AppCompatActivity implements AdapterView.OnItem
                       if(dataSnapshot.exists())
                       {
                           Log.d("datasnapshot","exists");
+                         OrderStatus orderStatus= dataSnapshot.getValue(OrderStatus.class);
 
                               customerOrder.checked=true;
-                              if(dataSnapshot.getValue().equals("Ordered"))
+                              customerOrder.setOrder(orderStatus.getOrder());
+                              if(orderStatus.status.equals("Ordered"))
                               {
                                   countOrder+=1;
 
@@ -610,7 +642,31 @@ public class AssignOrder extends AppCompatActivity implements AdapterView.OnItem
 
                       }
                       else {
+                          String yesterdayDate=getYesterdayDateString();
+                          customerTodayRef.child(yesterdayDate).child(carNumber).child(customer).addListenerForSingleValueEvent(new ValueEventListener() {
+                              @Override
+                              public void onDataChange(DataSnapshot dataSnapshot) {
+                                  if(dataSnapshot.exists()) {
+                                      OrderStatus orderStatus1 = dataSnapshot.getValue(OrderStatus.class);
+                                      customerOrder.setOrder(orderStatus1.getOrder());
+                                  }
+
+
+                              }
+
+                              @Override
+                              public void onCancelled(DatabaseError databaseError) {
+
+                              }
+                          });
                           customerOrder.checked = false;
+                          customerOrder.deliveryChecked=false;
+
+
+
+
+
+
 
                       }
                       if(k==len)
@@ -635,12 +691,138 @@ public class AssignOrder extends AppCompatActivity implements AdapterView.OnItem
 
         }
 
+
+
+                  private String checkNewDate(final String newdate) {
+
+
+
+
+           String ar[]= newdate.split("-");
+           Log.d("checkdd",Integer.parseInt(ar[2])+" "+Integer.parseInt(ar[1])+" "+Integer.parseInt(ar[0]));
+        Calendar date = new GregorianCalendar(Integer.parseInt(ar[2]), Integer.parseInt(ar[1]), Integer.parseInt(ar[0]));
+        date.add(Calendar.DATE, -1);
+        DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+        dateFormat.setCalendar(date);
+        String prevdate = dateFormat.format(date.getTime());
+        Log.d("checkda",prevdate);
+        return prevdate;
+
+
+
+ /*String mydate=newdate;
+        customerTodayRef.child(mydate).child(carNumber).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if(!dataSnapshot.exists())
+                {
+                   String ar[]= newdate.split("-");
+                   Log.d("mystring",ar[0]);
+                   if(ar[0].charAt(0)=='0')
+                   {
+                      char var= ar[0].charAt(1);
+                      Log.d("getvar",var+"");
+                       int a = Character.getNumericValue(var);
+                       if(a!=1) {
+
+                           a = a - 1;
+                       }
+                      ar[0]="0"+a;
+                   }
+                   else
+                   {
+                       int var=Integer.parseInt(ar[0]);
+                       var=var-1;
+                       ar[0]=var+"";
+                   }
+
+                   if(ar[0].equals("01"))
+                   {
+                       ar[0]="31";
+                       if(ar[1].charAt(0)=='0')
+                       {
+                           char var=ar[1].charAt(1);
+                           int a = Character.getNumericValue(var);
+                           if(a!=1) {
+
+                               a = a - 1;
+                           }
+                           ar[1]="0"+a;
+                           if(ar[1].equals("01"))
+                           {
+                               int year=Integer.parseInt(ar[2]);
+                               year=year-1;
+                               ar[2]=year+"";
+                           }
+
+
+
+                       }
+                       else
+                       {
+                           int var=Integer.parseInt(ar[1]);
+                           var=var-1;
+                           ar[1]=var+"";
+                       }
+
+
+
+
+                   }
+                    Log.d("dateresult",ar[0]+"-"+ar[1]+"-"+ar[2]);
+
+
+
+
+                }
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+        */
+    }
+
     private void getCustomerData() {
         Log.d("chksee","we are here");
         customerOrderList.clear();
         customRecyclerAdapter.notifyDataSetChanged();
+        carsDbRef.child(carNumber).child("Restaurants").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if(dataSnapshot.hasChildren())
+                {
+                    for(DataSnapshot ds:dataSnapshot.getChildren())
+                    {
+
+                        customerOrderList.add(new CustomerOrder(ds.getKey(),ds.getValue(Object.class).toString(),false,false,0));
 
 
+                    }
+                    getDeliveryData();
+                    pgbar.setVisibility(GONE);
+
+                }
+                else
+                {
+                    Toast.makeText(AssignOrder.this,"No records found!",Toast.LENGTH_LONG).show();
+                    pgbar.setVisibility(GONE);
+                    customRecyclerAdapter.notifyDataSetChanged();
+
+                }
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+/*
        customerReference.child(carNumber).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -678,6 +860,7 @@ public class AssignOrder extends AppCompatActivity implements AdapterView.OnItem
 
             }
         });
+        */
 
 
     }

@@ -6,11 +6,14 @@ import android.icu.util.ULocale;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.AppCompatCheckBox;
 import android.support.v7.widget.RecyclerView;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CompoundButton;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -72,16 +75,14 @@ public class CustomRecyclerAdapter extends RecyclerView.Adapter<CustomRecyclerAd
 
     @Override
     public void onBindViewHolder(final CustomRecyclerAdapter.ViewHolder holder, int position) {
-       final CustomerOrder customer=objects.get(position);
+        final CustomerOrder customer=objects.get(position);
 
         holder.tv.setText(customer.getCustomer());
         holder.engtv.setText(customer.getEngCustomerName());
-       // holder.engtv.setText(customer.getRestEnglish());
+        // holder.engtv.setText(customer.getRestEnglish());
         if(customer.isChecked())
         {
             holder.chkBox.setChecked(true);
-
-
 
 
         }
@@ -94,14 +95,19 @@ public class CustomRecyclerAdapter extends RecyclerView.Adapter<CustomRecyclerAd
 
 
         }
-        else
+        else {
             holder.deliverytv.setVisibility(View.INVISIBLE);
+        }
+
+        Log.d("checkdeliveryorder",objects.get(position).order+"");
+            holder.seqEditText.setText(objects.get(position).order+"");
 
 
 
 
 
-       holder.chkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+
+        holder.chkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
 
@@ -124,12 +130,21 @@ public class CustomRecyclerAdapter extends RecyclerView.Adapter<CustomRecyclerAd
 
                         //TODO change next date
 
+                        OrderStatus orderStatus=new OrderStatus(customer.engCustomerName,"Ordered",customer.getOrder());
+                        customerTodayReference.child(thisDate).child(((AssignOrder) context).carNumber).child(customer.getCustomer()).setValue(orderStatus);
 
 
 
 
 
-                        customerTodayReference.child(thisDate).child(((AssignOrder) context).carNumber).child(customer.getCustomer()).setValue("Ordered");
+
+
+                        // customerTodayReference.child(thisDate).child(((AssignOrder) context).carNumber).child(customer.getCustomer()).setValue("Ordered");
+
+
+                        //todo add carsRecord db adding extra key order
+                      //  carsRecordReference.child(((AssignOrder) context).carNumber).child(customer.getOrder()+"").setValue(customer.getCustomer(),customer.engCustomerName);
+
 
                     }
 
@@ -192,6 +207,7 @@ public class CustomRecyclerAdapter extends RecyclerView.Adapter<CustomRecyclerAd
         TextView tv;
         TextView engtv;
         TextView deliverytv;
+        EditText seqEditText;
         AppCompatCheckBox chkBox;
 
 
@@ -202,6 +218,27 @@ public class CustomRecyclerAdapter extends RecyclerView.Adapter<CustomRecyclerAd
              deliverytv=(TextView) itemView.findViewById(R.id.delivery_status);
 
          chkBox=(AppCompatCheckBox) itemView.findViewById(R.id.checkbox);
+         seqEditText=(EditText)itemView.findViewById(R.id.seqnumText);
+            seqEditText.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+                }
+
+                @Override
+                public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                    if(charSequence.length()>0)
+
+                    objects.get(getAdapterPosition()).setOrder(Integer.parseInt(seqEditText.getText().toString()));
+                }
+
+                @Override
+                public void afterTextChanged(Editable editable) {
+
+                }
+            });
+
+
         }
     }
 }
